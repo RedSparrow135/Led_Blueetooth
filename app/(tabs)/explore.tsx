@@ -1,110 +1,184 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Orbitron_400Regular, useFonts } from '@expo-google-fonts/orbitron'; // Fuente "Orbitron"
+import React, { useState } from 'react';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Slider } from 'react-native-elements'; // Importa Slider desde React Native Elements
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+export default function ExploreScreen() {
+  const [selectedSong, setSelectedSong] = useState<string | null>(null);  // Guardar la canción seleccionada
+  const [volume, setVolume] = useState<number>(50);  // Volumen visualizado de 0 a 100
+  const [isPlaying, setIsPlaying] = useState(false);  // Estado de la canción (reproduciendo/pausada)
+  
+  const [fontsLoaded] = useFonts({
+    Orbitron_400Regular,  // Cargar la fuente Orbitron
+  });
 
-export default function TabTwoScreen() {
+  if (!fontsLoaded) {
+    return null; // Asegurarse de que la fuente esté cargada antes de renderizar
+  }
+
+  const songList = Array.from({ length: 500 }, (_, i) => `Canción ${i + 1}`);
+
+  const playSong = (song: string) => {
+    setSelectedSong(song);
+    setIsPlaying(true);
+    console.log(`Reproduciendo: ${song}`);
+    // Aquí puedes agregar la lógica para enviar el comando de reproducción al dispositivo
+  };
+
+  const pauseSong = () => {
+    setIsPlaying(false);
+    console.log(`Pausando: ${selectedSong}`);
+    // Aquí puedes agregar la lógica para enviar el comando de pausa
+  };
+
+  const stopSong = () => {
+    setIsPlaying(false);
+    setSelectedSong(null);
+    console.log('Deteniendo la música');
+    // Aquí puedes agregar la lógica para detener la reproducción
+  };
+
+  const adjustVolume = (newVolume: number) => {
+    setVolume(newVolume);  // Volumen ajustado de 0 a 100
+    console.log(`Volumen ajustado a: ${newVolume}`);
+    // Aquí puedes agregar la lógica para ajustar el volumen del dispositivo
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
+    <View style={styles.container}>
+      {/* Título de la pantalla */}
+      <Text style={styles.header}>Lista de Canciones</Text>
+
+      {/* Mostrar la canción seleccionada */}
+      <Text style={styles.selectedSongText}>
+        {selectedSong ? `Canción seleccionada: ${selectedSong}` : 'Selecciona una canción'}
+      </Text>
+
+      {/* Cuadro para la lista de canciones */}
+      <View style={styles.songListContainer}>
+        <FlatList
+          data={songList}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.songButton}
+              onPress={() => playSong(item)}
+            >
+              <Text style={styles.buttonText}>{item}</Text>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item, index) => index.toString()}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Explore</ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Custom fonts">
-        <ThemedText>
-          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-          <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-            custom fonts such as this one.
-          </ThemedText>
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+      </View>
+
+      {/* Controles de reproducción */}
+      <View style={styles.controlsContainer}>
+        <TouchableOpacity
+          style={styles.gothicButton}
+          onPress={isPlaying ? pauseSong : () => playSong(selectedSong || '')}
+        >
+          <Text style={styles.buttonText}>{isPlaying ? 'Pausar' : 'Reproducir'}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.gothicButton}
+          onPress={stopSong}
+        >
+          <Text style={styles.buttonText}>Detener</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Control de volumen usando Slider de React Native Elements */}
+      <Text style={styles.volumeText}>Volumen: {volume}</Text>
+      <Slider
+        value={volume} // Escala de 0 a 100
+        onValueChange={adjustVolume}
+        minimumValue={0}
+        maximumValue={100}
+        step={1}
+        thumbTintColor="#FFCC00"
+        minimumTrackTintColor="#FFCC00"
+        maximumTrackTintColor="#888"
+        style={styles.volumeSlider}
+        animateTransitions={true}  // Hace que el slider sea más fluido
+        trackStyle={{ borderRadius: 10 }}  // Estilo de la pista
+        thumbStyle={{ width: 25, height: 25, borderRadius: 25, backgroundColor: '#FFCC00' }} // Personaliza el "thumb" (el círculo)
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    flex: 1,
+    backgroundColor: '#333',  // Fondo gris metálico oscuro para el fondo
+    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  titleContainer: {
+  header: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#FFCC00',  // Amarillo de advertencia
+    paddingTop: 50,  // Asegura que el título no quede pegado al notch
+    fontFamily: 'Orbitron_400Regular',  // Usar la fuente Orbitron
+  },
+  selectedSongText: {
+    fontSize: 16,
+    marginBottom: 10,
+    textAlign: 'center',
+    color: '#FFCC00',  // Amarillo de advertencia para la canción seleccionada
+    fontFamily: 'Orbitron_400Regular',  // Usar la fuente Orbitron
+  },
+  songListContainer: {
+    backgroundColor: '#222',  // Fondo oscuro para el cuadro de la lista
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 30,
+    width: '100%',
+    maxHeight: 250,  // Limitar la altura de la lista
+    shadowColor: '#000',  // Sombra para resaltar el cuadro
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+  },
+  songButton: {
+    padding: 10,
+    marginVertical: 5,
+    borderRadius: 5,
+    backgroundColor: '#444',  // Fondo gris oscuro para los botones de la lista
+  },
+  buttonText: {
+    color: '#FFCC00',  // Texto en amarillo
+    fontSize: 18,
+    fontFamily: 'Orbitron_400Regular',  // Usar la fuente Orbitron
+    textAlign: 'center',
+  },
+  controlsContainer: {
     flexDirection: 'row',
-    gap: 8,
+    justifyContent: 'space-around',
+    marginTop: 30,
+    width: '100%',
+  },
+  volumeText: {
+    fontSize: 18,
+    color: '#FFCC00',  // Amarillo brillante para el texto del volumen
+    marginTop: 20,
+    fontFamily: 'Orbitron_400Regular',  // Usar la fuente Orbitron
+  },
+  volumeSlider: {
+    width: '80%',
+    height: 40,
+    marginTop: 10,
+  },
+  gothicButton: {
+    fontFamily: 'Orbitron_400Regular',  // Aplicar la fuente Orbitron a los botones
+    borderWidth: 2,
+    borderColor: '#FF6347', // Borde rojo para el botón
+    borderRadius: 5,
+    padding: 10,
+    backgroundColor: '#222',  // Fondo oscuro para los botones
+    marginVertical: 10,  // Separación vertical entre botones
   },
 });
